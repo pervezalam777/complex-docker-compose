@@ -1,0 +1,42 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t pervezalam777/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true pervezalam777/react-test npm run test -- --coverage
+
+after_success:
+  - docker build -t pervezalam777/multi-client ./client
+  - docker build -t pervezalam777/multi-nginx ./nginx
+  - docker build -t pervezalam777/multi-server ./server
+  - docerk build -t pervezalam777/multi-worker ./worker
+  # $DOCKER_PASSWORD and $DOCKER_ID are environment variable
+  # that would be added on travis site in setting option for github repo
+  # following command will login to docker hub
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push pervezalam777/multi-client
+  - docker push pervezalam777/multi-nginx
+  - docker push pervezalam777/multi-server
+  - docker push pervezalam777/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: us-west-1
+  app: multi-docker
+  env: MultiDocker-env
+  bucket_name: elasticbeanstalk-us-west-1-306476627547
+  bucket_path: docker-multi
+  on:
+    branch: master
+  access_key_id:
+    secure: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: $AWS_SECRET_KEY
+
+
+
+
