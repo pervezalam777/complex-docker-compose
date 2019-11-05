@@ -12,7 +12,7 @@ after_success:
   - docker build -t pervezalam777/multi-client ./client
   - docker build -t pervezalam777/multi-nginx ./nginx
   - docker build -t pervezalam777/multi-server ./server
-  - docerk build -t pervezalam777/multi-worker ./worker
+  - docker build -t pervezalam777/multi-worker ./worker
   # $DOCKER_PASSWORD and $DOCKER_ID are environment variable
   # that would be added on travis site in setting option for github repo
   # following command will login to docker hub
